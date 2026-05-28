@@ -1,0 +1,75 @@
+import gradio as gr
+import torch
+from PIL import Image
+import pyttsx3
+
+# ---------------------------
+# Load Models (PLACEHOLDER)
+# Replace with your actual model loading logic
+# ---------------------------
+
+def load_model(model_name):
+    if model_name == "CNN_LSTM":
+        return torch.load("lstm_caption_model.pth", map_location="cpu")
+    elif model_name == "CNN_LSTM_Attention":
+        return torch.load("attention_full_model.pth", map_location="cpu")
+    elif model_name == "BLIP":
+        return torch.load("blip_best_model.pth", map_location="cpu")
+    elif model_name == "BLIP_Attention":
+        return torch.load("blip_attention_best.pth", map_location="cpu")
+
+# ---------------------------
+# Caption Generation (Dummy placeholder)
+# Replace with actual inference logic
+# ---------------------------
+
+def generate_caption(image, model_name):
+    model = load_model(model_name)
+    
+    # TODO: Replace this with actual preprocessing + inference
+    caption = f"Generated caption using {model_name}"
+    
+    # Text-to-Speech
+    engine = pyttsx3.init()
+    engine.say(caption)
+    engine.runAndWait()
+    
+    return caption
+
+# ---------------------------
+# Gradio UI
+# ---------------------------
+
+with gr.Blocks() as demo:
+    gr.Markdown("# Image Captioning App with TTS")
+    
+    with gr.Row():
+        image_input = gr.Image(type="pil", label="Upload Image")
+        
+        model_choice = gr.Dropdown(
+            choices=[
+                "CNN_LSTM",
+                "CNN_LSTM_Attention",
+                "BLIP",
+                "BLIP_Attention"
+            ],
+            value="BLIP",
+            label="Select Model"
+        )
+    
+    caption_output = gr.Textbox(label="Generated Caption")
+    
+    generate_btn = gr.Button("Generate Caption")
+    
+    generate_btn.click(
+        fn=generate_caption,
+        inputs=[image_input, model_choice],
+        outputs=caption_output
+    )
+
+# ---------------------------
+# Launch App
+# ---------------------------
+
+if __name__ == "__main__":
+    demo.launch()
